@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .game-container {
+            width: 300px;
+            height: 250px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .game-header {
+            background: #2c3e50;
+            color: white;
+            padding: 8px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 10px;
+            background: #34495e;
+            color: white;
+            font-size: 12px;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 5px;
+            padding: 10px;
+            height: calc(100% - 70px);
+        }
+
+        .tile {
+            background: #3498db;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+            position: relative;
+        }
+
+        .tile.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .tile.matched {
+            background: #2ecc71;
+            cursor: default;
+        }
+
+        .tile-front, .tile-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+        }
+
+        .tile-front {
+            background: #3498db;
+            color: white;
+            font-size: 20px;
+        }
+
+        .tile-back {
+            background: white;
+            transform: rotateY(180deg);
+            font-size: 24px;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 10;
+            display: none;
+        }
+
+        .game-over h2 {
+            margin-bottom: 10px;
+        }
+
+        .game-over p {
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #c0392b;
+        }
+
+        .btn-exit {
+            background: #2ecc71;
+        }
+
+        .btn-exit:hover {
+            background: #27ae60;
+        }
+
+        /* Focus styles for accessibility */
+        .tile:focus, .btn:focus {
+            outline: 2px solid #f1c40f;
+            outline-offset: 2px;
+        }
+
+        /* Responsive styles for different sizes */
+        @media (min-height: 600px) {
+            .game-container {
+                width: 300px;
+                height: 600px;
+            }
+            
+            .game-board {
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: repeat(6, 1fr);
+            }
+        }
+
+        @media (max-width: 320px) and (max-height: 480px) {
+            .game-container {
+                width: 320px;
+                height: 480px;
+            }
+            
+            .game-board {
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container" id="gameContainer">
+        <div class="game-header">
+            Memory Game
+        </div>
+        <div class="stats-bar">
+            <div class="timer">Time: <span id="timer">0</span>s</div>
+            <div class="attempts">Attempts: <span id="attempts">0</span></div>
+            <div class="matches">Matches: <span id="matches">0</span>/6</div>
+        </div>
+        <div class="game-board" id="gameBoard">
+            <!-- Tiles will be generated by JavaScript -->
+        </div>
+        <div class="game-over" id="gameOver">
+            <h2>Congratulations!</h2>
+            <p>You found all pairs in <span id="finalTime">0</span> seconds with <span id="finalAttempts">0</span> attempts!</p>
+            <button class="btn" id="replayBtn">Play Again</button>
+            <button class="btn btn-exit" id="exitBtn">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            tiles: [],
+            flippedTiles: [],
+            matchedPairs: 0,
+            attempts: 0,
+            totalPairs: 6,
+            gameStarted: false,
+            startTime: null,
+            timerInterval: null,
+            elapsedTime: 0
+        };
+
+        // Tile symbols (using emoji for simplicity - would be images in production)
+        const symbols = ['🍎', '🍌', '🍒', '🍇', '🍊', '🍓', '🥝', '🍑', '🍍', '🥥', '🫐', '🍋'];
+        
+        // Initialize the game
+        function initGame() {
+            const gameBoard = document.getElementById('gameBoard');
+            gameBoard.innerHTML = '';
+            
+            // Reset game state
+            gameState.tiles = [];
+            gameState.flippedTiles = [];
+            gameState.matchedPairs = 0;
+            gameState.attempts = 0;
+            gameState.gameStarted = false;
+            gameState.elapsedTime = 0;
+            
+            // Update UI
+            document.getElementById('attempts').textContent = '0';
+            document.getElementById('matches').textContent = '0/' + gameState.totalPairs;
+            document.getElementById('timer').textContent = '0';
+            document.getElementById('gameOver').style.display = 'none';
+            
+            // Clear timer if running
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+                gameState.timerInterval = null;
+            }
+            
+            // Create tile pairs
+            const gameSymbols = symbols.slice(0, gameState.totalPairs);
+            const tileValues = [...gameSymbols, ...gameSymbols];
+            
+            // Shuffle tiles
+            shuffleArray(tileValues);
+            
+            // Create tiles
+            tileValues.forEach((symbol, index) => {
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                tile.setAttribute('data-index', index);
+                tile.setAttribute('data-value', symbol);
+                tile.setAttribute('tabindex', '0'); // Make focusable for accessibility
+                
+                const tileFront = document.createElement('div');
+                tileFront.className = 'tile-front';
+                tileFront.textContent = '?';
+                
+                const tileBack = document.createElement('div');
+                tileBack.className = 'tile-back';
+                tileBack.textContent = symbol;
+                
+                tile.appendChild(tileFront);
+                tile.appendChild(tileBack);
+                
+                // Add click event
+                tile.addEventListener('click', handleTileClick);
+                
+                // Add keyboard event for accessibility
+                tile.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleTileClick(e);
+                    }
+                });
+                
+                gameBoard.appendChild(tile);
+                gameState.tiles.push({
+                    element: tile,
+                    value: symbol,
+                    isFlipped: false,
+                    isMatched: false
+                });
+            });
+        }
+
+        // Handle tile click
+        function handleTileClick(event) {
+            const tileElement = event.currentTarget;
+            const tileIndex = parseInt(tileElement.getAttribute('data-index'));
+            const tile = gameState.tiles[tileIndex];
+            
+            // Ignore if tile is already flipped or matched
+            if (tile.isFlipped || tile.isMatched || gameState.flippedTiles.length >= 2) {
+                return;
+            }
+            
+            // Start game timer on first flip
+            if (!gameState.gameStarted) {
+                startGame();
+            }
+            
+            // Flip the tile
+            flipTile(tileIndex);
+            
+            // Add to flipped tiles
+            gameState.flippedTiles.push(tileIndex);
+            
+            // Check for match if two tiles are flipped
+            if (gameState.flippedTiles.length === 2) {
+                gameState.attempts++;
+                document.getElementById('attempts').textContent = gameState.attempts;
+                
+                // Dispatch pair attempt event
+                window.dispatchEvent(new CustomEvent('bm_pair_match', {
+                    detail: {
+                        pairsFound: gameState.matchedPairs,
+                        attempts: gameState.attempts
+                    }
+                }));
+                
+                const tile1Index = gameState.flippedTiles[0];
+                const tile2Index = gameState.flippedTiles[1];
+                const tile1 = gameState.tiles[tile1Index];
+                const tile2 = gameState.tiles[tile2Index];
+                
+                if (tile1.value === tile2.value) {
+                    // Match found
+                    tile1.isMatched = true;
+                    tile2.isMatched = true;
+                    gameState.matchedPairs++;
+                    
+                    document.getElementById('matches').textContent = 
+                        `${gameState.matchedPairs}/${gameState.totalPairs}`;
+                    
+                    // Reset flipped tiles
+                    gameState.flippedTiles = [];
+                    
+                    // Check for game completion
+                    if (gameState.matchedPairs === gameState.totalPairs) {
+                        endGame();
+                    }
+                } else {
+                    // No match - flip back after delay
+                    setTimeout(() => {
+                        flipTile(tile1Index);
+                        flipTile(tile2Index);
+                        gameState.flippedTiles = [];
+                    }, 1000);
+                }
+            }
+        }
+
+        // Flip a tile
+        function flipTile(index) {
+            const tile = gameState.tiles[index];
+            tile.isFlipped = !tile.isFlipped;
+            
+            if (tile.isFlipped) {
+                tile.element.classList.add('flipped');
+            } else {
+                tile.element.classList.remove('flipped');
+            }
+            
+            // Add matched class if tile is matched
+            if (tile.isMatched) {
+                tile.element.classList.add('matched');
+            }
+        }
+
+        // Start the game
+        function startGame() {
+            gameState.gameStarted = true;
+            gameState.startTime = Date.now();
+            
+            // Start timer
+            gameState.timerInterval = setInterval(() => {
+                gameState.elapsedTime = Math.floor((Date.now() - gameState.startTime) / 1000);
+                document.getElementById('timer').textContent = gameState.elapsedTime;
+            }, 1000);
+            
+            // Dispatch game start event
+            window.dispatchEvent(new CustomEvent('bm_game_start'));
+        }
+
+        // End the game
+        function endGame() {
+            // Stop timer
+            clearInterval(gameState.timerInterval);
+            
+            // Update final stats
+            document.getElementById('finalTime').textContent = gameState.elapsedTime;
+            document.getElementById('finalAttempts').textContent = gameState.attempts;
+            
+            // Show game over screen
+            document.getElementById('gameOver').style.display = 'flex';
+            
+            // Dispatch game complete event
+            window.dispatchEvent(new CustomEvent('bm_game_complete', {
+                detail: {
+                    attempts: gameState.attempts,
+                    timeMs: gameState.elapsedTime * 1000
+                }
+            }));
+        }
+
+        // Utility function to shuffle array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Set up event listeners for buttons
+        document.getElementById('replayBtn').addEventListener('click', initGame);
+        document.getElementById('exitBtn').addEventListener('click', () => {
+            // Dispatch exit click event
+            window.dispatchEvent(new CustomEvent('bm_exit_click'));
+            
+            // In a real ad, this would trigger the exit URL
+            alert('Exit CTA clicked - would navigate to advertiser URL');
+        });
+
+        // Initialize the game when page loads
+        window.addEventListener('DOMContentLoaded', initGame);
+        onclick="ExitApi.exit()"
+    </script>
+</body>
+</html>
