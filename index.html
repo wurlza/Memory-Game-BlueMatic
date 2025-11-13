@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             display: flex;
             justify-content: center;
@@ -25,49 +25,93 @@
             width: 300px;
             height: 250px;
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
             overflow: hidden;
             position: relative;
+            transition: all 0.3s ease;
         }
 
         .game-header {
-            background: #2c3e50;
+            background: linear-gradient(to right, #2c3e50, #4a6491);
             color: white;
-            padding: 8px;
+            padding: 10px;
             text-align: center;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(30deg);
         }
 
         .stats-bar {
             display: flex;
             justify-content: space-between;
-            padding: 5px 10px;
+            padding: 8px 12px;
             background: #34495e;
             color: white;
             font-size: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            font-size: 14px;
         }
 
         .game-board {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            gap: 5px;
-            padding: 10px;
-            height: calc(100% - 70px);
+            gap: 8px;
+            padding: 20px;
+            position: relative;
+            height: calc(100% - 80px);
+            background: #f8f9fa;
         }
 
         .tile {
-            background: #3498db;
-            border-radius: 5px;
+            background: linear-gradient(145deg, #3498db, #2980b9);
+            border-radius: 6px;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
             transform-style: preserve-3d;
-            transition: transform 0.5s;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+        }
+
+        .tile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2);
         }
 
         .tile.flipped {
@@ -75,8 +119,14 @@
         }
 
         .tile.matched {
-            background: #2ecc71;
+            background: linear-gradient(145deg, #2ecc71, #27ae60);
             cursor: default;
+            animation: pulse 0.5s;
+        }
+
+        .tile.mismatch {
+            background: linear-gradient(145deg, #e74c3c, #c0392b);
+            animation: shake 0.5s;
         }
 
         .tile-front, .tile-back {
@@ -87,19 +137,22 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 5px;
+            border-radius: 6px;
         }
 
         .tile-front {
-            background: #3498db;
+            background: linear-gradient(145deg, #3498db, #2980b9);
             color: white;
-            font-size: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .tile-back {
             background: white;
             transform: rotateY(180deg);
-            font-size: 24px;
+            font-size: 22px;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
         }
 
         .game-over {
@@ -108,7 +161,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -116,32 +169,64 @@
             color: white;
             z-index: 10;
             display: none;
+            padding: 20px;
+            text-align: center;
         }
 
         .game-over h2 {
             margin-bottom: 10px;
+            font-size: 24px;
+            color: #f1c40f;
         }
 
         .game-over p {
             margin-bottom: 15px;
             text-align: center;
             font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .final-stats {
+            display: flex;
+            gap: 15px;
+            margin: 10px 0;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 6px;
+            min-width: 70px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .stat-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2ecc71;
         }
 
         .btn {
             background: #e74c3c;
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
+            padding: 10px 18px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
             margin: 5px;
-            transition: background 0.3s;
+            transition: all 0.3s;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
         }
 
         .btn:hover {
             background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2);
         }
 
         .btn-exit {
@@ -152,10 +237,109 @@
             background: #27ae60;
         }
 
+        .difficulty-selector {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 15;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .difficulty-selector h2 {
+            margin-bottom: 15px;
+            color: #f1c40f;
+        }
+
+        .difficulty-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 8px;
+            width: 180px;
+            transition: all 0.3s;
+        }
+
+        .difficulty-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .sound-toggle {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            z-index: 5;
+        }
+
         /* Focus styles for accessibility */
-        .tile:focus, .btn:focus {
+        .tile:focus, .btn:focus, .difficulty-btn:focus, .theme-toggle:focus, .sound-toggle:focus {
             outline: 2px solid #f1c40f;
             outline-offset: 2px;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Dark theme */
+        .dark-theme {
+            background: linear-gradient(135deg, #232526, #414345);
+        }
+
+        .dark-theme .game-container {
+            background: #2c3e50;
+            color: white;
+        }
+
+        .dark-theme .game-board {
+            background: #34495e;
+        }
+
+        .dark-theme .tile-front {
+            background: linear-gradient(145deg, #34495e, #2c3e50);
+        }
+
+        .dark-theme .tile-back {
+            background: #ecf0f1;
         }
 
         /* Responsive styles for different sizes */
@@ -187,22 +371,55 @@
 <body>
     <div class="game-container" id="gameContainer">
         <div class="game-header">
-            Memory Game
+            <span>Memory Game</span>
+            <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌓</button>
         </div>
         <div class="stats-bar">
-            <div class="timer">Time: <span id="timer">0</span>s</div>
-            <div class="attempts">Attempts: <span id="attempts">0</span></div>
-            <div class="matches">Matches: <span id="matches">0</span>/6</div>
+            <div class="stat-item">
+                <div>Time</div>
+                <div class="stat-value" id="timer">0</div>
+            </div>
+            <div class="stat-item">
+                <div>Attempts</div>
+                <div class="stat-value" id="attempts">0</div>
+            </div>
+            <div class="stat-item">
+                <div>Matches</div>
+                <div class="stat-value" id="matches">0/6</div>
+            </div>
         </div>
         <div class="game-board" id="gameBoard">
             <!-- Tiles will be generated by JavaScript -->
         </div>
         <div class="game-over" id="gameOver">
             <h2>Congratulations!</h2>
-            <p>You found all pairs in <span id="finalTime">0</span> seconds with <span id="finalAttempts">0</span> attempts!</p>
-            <button class="btn" id="replayBtn">Play Again</button>
-            <button class="btn btn-exit" id="exitBtn">Continue</button>
+            <p>You found all the matching pairs!</p>
+            <div class="final-stats">
+                <div class="stat-box">
+                    <div class="stat-label">Time</div>
+                    <div class="stat-number" id="finalTime">0s</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Attempts</div>
+                    <div class="stat-number" id="finalAttempts">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Score</div>
+                    <div class="stat-number" id="finalScore">0</div>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn" id="replayBtn">Play Again</button>
+                <button class="btn btn-exit" id="exitBtn">Continue</button>
+            </div>
         </div>
+        <div class="difficulty-selector" id="difficultySelector">
+            <h2>Select Difficulty</h2>
+            <button class="difficulty-btn" data-difficulty="easy">Easy (6 pairs)</button>
+            <button class="difficulty-btn" data-difficulty="medium">Medium (8 pairs)</button>
+            <button class="difficulty-btn" data-difficulty="hard">Hard (12 pairs)</button>
+        </div>
+        <button class="sound-toggle" id="soundToggle" title="Toggle sound">🔊</button>
     </div>
 
     <script>
@@ -216,12 +433,24 @@
             gameStarted: false,
             startTime: null,
             timerInterval: null,
-            elapsedTime: 0
+            elapsedTime: 0,
+            difficulty: 'easy',
+            soundEnabled: true,
+            darkTheme: false,
+            bestScore: null
         };
 
         // Tile symbols (using emoji for simplicity - would be images in production)
-        const symbols = ['🍎', '🍌', '🍒', '🍇', '🍊', '🍓', '🥝', '🍑', '🍍', '🥥', '🫐', '🍋'];
+        const symbols = ['🍎', '🍌', '🍒', '🍇', '🍊', '🍓', '🥝', '🍑', '🍍', '🥥', '🫐', '🍋', '🥭', '🌰', '🥑', '🌽'];
         
+        // Sound effects (using base64 encoded short audio clips for demo)
+        const soundEffects = {
+            flip: new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA=="),
+            match: new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA=="),
+            mismatch: new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA=="),
+            complete: new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==")
+        };
+
         // Initialize the game
         function initGame() {
             const gameBoard = document.getElementById('gameBoard');
@@ -237,7 +466,7 @@
             
             // Update UI
             document.getElementById('attempts').textContent = '0';
-            document.getElementById('matches').textContent = '0/' + gameState.totalPairs;
+            document.getElementById('matches').textContent = `0/${gameState.totalPairs}`;
             document.getElementById('timer').textContent = '0';
             document.getElementById('gameOver').style.display = 'none';
             
@@ -246,6 +475,9 @@
                 clearInterval(gameState.timerInterval);
                 gameState.timerInterval = null;
             }
+            
+            // Set grid based on difficulty
+            setGridLayout();
             
             // Create tile pairs
             const gameSymbols = symbols.slice(0, gameState.totalPairs);
@@ -294,6 +526,28 @@
             });
         }
 
+        // Set grid layout based on difficulty
+        function setGridLayout() {
+            const gameBoard = document.getElementById('gameBoard');
+            gameBoard.style.gridTemplateColumns = '';
+            gameBoard.style.gridTemplateRows = '';
+            
+            switch(gameState.difficulty) {
+                case 'easy':
+                    gameBoard.style.gridTemplateColumns = 'repeat(4, 1fr)';
+                    gameBoard.style.gridTemplateRows = 'repeat(3, 1fr)';
+                    break;
+                case 'medium':
+                    gameBoard.style.gridTemplateColumns = 'repeat(4, 1fr)';
+                    gameBoard.style.gridTemplateRows = 'repeat(4, 1fr)';
+                    break;
+                case 'hard':
+                    gameBoard.style.gridTemplateColumns = 'repeat(4, 1fr)';
+                    gameBoard.style.gridTemplateRows = 'repeat(6, 1fr)';
+                    break;
+            }
+        }
+
         // Handle tile click
         function handleTileClick(event) {
             const tileElement = event.currentTarget;
@@ -304,6 +558,9 @@
             if (tile.isFlipped || tile.isMatched || gameState.flippedTiles.length >= 2) {
                 return;
             }
+            
+            // Play flip sound
+            playSound('flip');
             
             // Start game timer on first flip
             if (!gameState.gameStarted) {
@@ -336,12 +593,17 @@
                 
                 if (tile1.value === tile2.value) {
                     // Match found
+                    playSound('match');
                     tile1.isMatched = true;
                     tile2.isMatched = true;
                     gameState.matchedPairs++;
                     
                     document.getElementById('matches').textContent = 
                         `${gameState.matchedPairs}/${gameState.totalPairs}`;
+                    
+                    // Add matched class
+                    tile1.element.classList.add('matched');
+                    tile2.element.classList.add('matched');
                     
                     // Reset flipped tiles
                     gameState.flippedTiles = [];
@@ -351,10 +613,17 @@
                         endGame();
                     }
                 } else {
-                    // No match - flip back after delay
+                    // No match
+                    playSound('mismatch');
+                    tile1.element.classList.add('mismatch');
+                    tile2.element.classList.add('mismatch');
+                    
+                    // Flip back after delay
                     setTimeout(() => {
                         flipTile(tile1Index);
                         flipTile(tile2Index);
+                        tile1.element.classList.remove('mismatch');
+                        tile2.element.classList.remove('mismatch');
                         gameState.flippedTiles = [];
                     }, 1000);
                 }
@@ -370,11 +639,6 @@
                 tile.element.classList.add('flipped');
             } else {
                 tile.element.classList.remove('flipped');
-            }
-            
-            // Add matched class if tile is matched
-            if (tile.isMatched) {
-                tile.element.classList.add('matched');
             }
         }
 
@@ -398,20 +662,59 @@
             // Stop timer
             clearInterval(gameState.timerInterval);
             
+            // Calculate score
+            const score = calculateScore();
+            
             // Update final stats
-            document.getElementById('finalTime').textContent = gameState.elapsedTime;
+            document.getElementById('finalTime').textContent = `${gameState.elapsedTime}s`;
             document.getElementById('finalAttempts').textContent = gameState.attempts;
+            document.getElementById('finalScore').textContent = score;
+            
+            // Check for best score
+            checkBestScore(score);
             
             // Show game over screen
             document.getElementById('gameOver').style.display = 'flex';
+            
+            // Play completion sound
+            playSound('complete');
             
             // Dispatch game complete event
             window.dispatchEvent(new CustomEvent('bm_game_complete', {
                 detail: {
                     attempts: gameState.attempts,
-                    timeMs: gameState.elapsedTime * 1000
+                    timeMs: gameState.elapsedTime * 1000,
+                    score: score
                 }
             }));
+        }
+
+        // Calculate score based on time and attempts
+        function calculateScore() {
+            const timeBonus = Math.max(0, 1000 - gameState.elapsedTime * 10);
+            const attemptBonus = Math.max(0, 500 - gameState.attempts * 5);
+            return timeBonus + attemptBonus;
+        }
+
+        // Check and update best score
+        function checkBestScore(score) {
+            const storageKey = `memoryGameBestScore_${gameState.difficulty}`;
+            const bestScore = localStorage.getItem(storageKey);
+            
+            if (!bestScore || score > bestScore) {
+                localStorage.setItem(storageKey, score);
+                gameState.bestScore = score;
+            } else {
+                gameState.bestScore = parseInt(bestScore);
+            }
+        }
+
+        // Play sound effect
+        function playSound(soundName) {
+            if (gameState.soundEnabled && soundEffects[soundName]) {
+                soundEffects[soundName].currentTime = 0;
+                soundEffects[soundName].play().catch(e => console.log("Audio play failed:", e));
+            }
         }
 
         // Utility function to shuffle array
@@ -423,19 +726,62 @@
             return array;
         }
 
-        // Set up event listeners for buttons
-        document.getElementById('replayBtn').addEventListener('click', initGame);
-        document.getElementById('exitBtn').addEventListener('click', () => {
-            // Dispatch exit click event
-            window.dispatchEvent(new CustomEvent('bm_exit_click'));
+        // Set up event listeners
+        function setupEventListeners() {
+            // Replay button
+            document.getElementById('replayBtn').addEventListener('click', () => {
+                document.getElementById('gameOver').style.display = 'none';
+                initGame();
+            });
             
-            // In a real ad, this would trigger the exit URL
-            alert('Exit CTA clicked - would navigate to advertiser URL');
-        });
+            // Exit button
+            document.getElementById('exitBtn').addEventListener('click', () => {
+                // Dispatch exit click event
+                window.dispatchEvent(new CustomEvent('bm_exit_click'));
+                
+                // In a real ad, this would trigger the exit URL
+                alert('Exit CTA clicked - would navigate to advertiser URL');
+            });
+            
+            // Difficulty buttons
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const difficulty = e.target.getAttribute('data-difficulty');
+                    gameState.difficulty = difficulty;
+                    
+                    // Set total pairs based on difficulty
+                    switch(difficulty) {
+                        case 'easy': gameState.totalPairs = 6; break;
+                        case 'medium': gameState.totalPairs = 8; break;
+                        case 'hard': gameState.totalPairs = 12; break;
+                    }
+                    
+                    document.getElementById('difficultySelector').style.display = 'none';
+                    initGame();
+                });
+            });
+            
+            // Theme toggle
+            document.getElementById('themeToggle').addEventListener('click', () => {
+                gameState.darkTheme = !gameState.darkTheme;
+                document.body.classList.toggle('dark-theme', gameState.darkTheme);
+                document.getElementById('themeToggle').textContent = gameState.darkTheme ? '🌞' : '🌓';
+            });
+            
+            // Sound toggle
+            document.getElementById('soundToggle').addEventListener('click', () => {
+                gameState.soundEnabled = !gameState.soundEnabled;
+                document.getElementById('soundToggle').textContent = gameState.soundEnabled ? '🔊' : '🔇';
+            });
+        }
 
         // Initialize the game when page loads
-        window.addEventListener('DOMContentLoaded', initGame);
-        onclick="ExitApi.exit()"
+        window.addEventListener('DOMContentLoaded', () => {
+            setupEventListeners();
+            
+            // Show difficulty selector initially
+            document.getElementById('difficultySelector').style.display = 'flex';
+        });
     </script>
 </body>
 </html>
